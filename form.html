@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Loan Application</title>
+    <style>
+        body {
+            background: #282c34;
+            font-size: 2vmin;
+            font-family: JetBrains Mono, monospace;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #e4bb68;
+        }
+
+
+        .container {
+            max-width: 2000px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        #location {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Loan Application</h2>
+        <form id="loanApplicationForm">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="amount">Loan Amount</label>
+            <input type="number" id="amount" name="amount" required>
+
+            <label for="employment">Employment Status</label>
+            <select id="employment" name="employment">
+                <option value="employed">Employed</option>
+                <option value="self-employed">Self-Employed</option>
+                <option value="unemployed">Unemployed</option>
+            </select>
+
+            <label for="purpose">Loan Purpose</label>
+            <input type="text" id="purpose" name="purpose" required>
+
+            <button type="submit">Submit</button>
+        </form>
+
+        <div id="location"></div>
+    </div>
+
+    <script>
+        // Function to get the user's location
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, locationError);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        // Function to display the user's location
+        function showPosition(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            const locationElement = document.getElementById('location');
+            locationElement.innerHTML = `Your Location: Latitude ${latitude}, Longitude ${longitude}`;
+        }
+
+        // Function to handle location errors
+        function locationError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+
+        // Attach a location request event to the form submission
+        document.getElementById("loanApplicationForm").addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent form submission
+
+            if (confirm("Do you want to share your location for this loan application?")) {
+                getLocation(); // Request location access
+            }
+        });
+    </script>
+</body>
+
+</html>

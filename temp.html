@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Loan Calculator with Range Inputs and Stylish Pie Chart</title>
+    <style>
+        /* Styling for the page */
+        body {
+            background: #282c34;
+            font-size: 2vmin;
+            font-family: JetBrains Mono, monospace;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #e4bb68;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #282c34;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            color: wheat;
+            border-radius: 5px;
+        }
+
+        h1 {
+            text-align: center;
+            color: wheat;
+        }
+
+        /* Styling for the calculator */
+        .calculator {
+            padding: 20px;
+            background-color: #282c34;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 10px;
+            color: wheat;
+            /* Black text */
+        }
+
+        input[type="range"] {
+            width: 100%;
+            background-color: #4CAF50;
+            /* Green color for input range */
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            background-color: black;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background-color: black;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:active {
+            background-color: black;
+        }
+
+        button {
+            background-color: black;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: black;
+        }
+
+        /* Styling for the pie chart canvas */
+        canvas {
+            display: block;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            /* Set canvas dimensions using CSS */
+            width: 200px;
+            height: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Loan Calculator</h1>
+        <div class="calculator">
+            <label for="loanAmount">Loan Amount: <span id="loanAmountValue">10000</span></label>
+            <input type="range" id="loanAmount" min="1000" max="50000" step="1000" value="10000"><br><br>
+            <label for="interestRate">Annual Interest Rate: <span id="interestRateValue">5%</span></label>
+            <input type="range" id="interestRate" min="1" max="20" step="0.5" value="5"><br><br>
+            <label for="loanTerm">Loan Term: <span id="loanTermValue">24</span> months</label>
+            <input type="range" id="loanTerm" min="12" max="120" step="6" value="24"><br><br>
+            <button id="calculate">Calculate</button>
+        </div>
+        <canvas id="chart"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('chart').getContext('2d');
+        const loanAmountInput = document.getElementById('loanAmount');
+        const interestRateInput = document.getElementById('interestRate');
+        const loanTermInput = document.getElementById('loanTerm');
+        const loanAmountValue = document.getElementById('loanAmountValue');
+        const interestRateValue = document.getElementById('interestRateValue');
+        const loanTermValue = document.getElementById('loanTermValue');
+        const calculateButton = document.getElementById('calculate');
+
+        loanAmountInput.addEventListener('input', function () {
+            loanAmountValue.textContent = loanAmountInput.value;
+        });
+
+        interestRateInput.addEventListener('input', function () {
+            interestRateValue.textContent = interestRateInput.value + '%';
+        });
+
+        loanTermInput.addEventListener('input', function () {
+            loanTermValue.textContent = loanTermInput.value;
+        });
+
+        calculateButton.addEventListener('click', function () {
+            const loanAmount = parseFloat(loanAmountInput.value);
+            const interestRate = parseFloat(interestRateInput.value) / 100 / 12;
+            const loanTerm = parseFloat(loanTermInput.value);
+
+            const monthlyPayment = (loanAmount * interestRate * (Math.pow(1 + interestRate, loanTerm))) / (Math.pow(1 + interestRate, loanTerm) - 1);
+            const totalPayment = monthlyPayment * loanTerm;
+            const totalInterest = totalPayment - loanAmount;
+
+            const principalPercentage = (loanAmount / totalPayment) * 100;
+            const interestPercentage = (totalInterest / totalPayment) * 100;
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Principal', 'Interest'],
+                    datasets: [{
+                        data: [principalPercentage, interestPercentage],
+                        backgroundColor: ['#36A2EB', '#FFCE56']
+                    }]
+                }
+            });
+        });
+
+        calculateButton.addEventListener('mouseover', function () {
+            // Handle mouseover event (e.g., change button color)
+            calculateButton.style.backgroundColor = '#FFCE56';
+        });
+
+        calculateButton.addEventListener('mouseout', function () {
+            // Handle mouseout event (e.g., revert button color)
+            calculateButton.style.backgroundColor = 'black';
+        });
+    </script>
+</body>
+
+</html>
