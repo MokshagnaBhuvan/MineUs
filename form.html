@@ -4,7 +4,8 @@
 <head>
     <title>Loan Application</title>
     <style>
-        body {
+        /* Your existing styles here */
+ body {
             background: #282c34;
             font-size: 2vmin;
             font-family: JetBrains Mono, monospace;
@@ -30,11 +31,15 @@
             margin: 10px 0;
         }
     </style>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 
 <body>
     <div class="container">
         <h2>Loan Application</h2>
+        <form id="loanApplicationForm">
+            <!-- Your form fields here -->
+
         <form id="loanApplicationForm">
             <label for="name">Name</label>
             <input type="text" id="name" name="name" required>
@@ -58,54 +63,47 @@
             <button type="submit">Submit</button>
         </form>
 
+ 
+
+            <div class="g-recaptcha" data-sitekey="6LcjbMooAAAAAEceTUxHpU_S81JR3lzK7ZFdMQql"></div>
+            <button type="button" onclick="submitForm()">Submit</button>
+        </form>
+
         <div id="location"></div>
+        <div id="result"></div>
     </div>
 
     <script>
-        // Function to get the user's location
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, locationError);
+        function submitForm() {
+            var response = grecaptcha.getResponse();
+
+            if (response.length === 0) {
+                // reCAPTCHA not verified
+                document.getElementById('result').innerHTML = 'Please complete the reCAPTCHA.';
             } else {
-                alert("Geolocation is not supported by this browser.");
+                // reCAPTCHA verified, proceed with form submission
+                var formData = {
+                    // Get form data here (e.g., using document.getElementById)
+                };
+
+                // Send formData to serverless function for processing
+                fetch('/.netlify/functions/processForm', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('result').innerHTML = data.message;
+                })
+                .catch(error => {
+                    console.error(error);
+                    document.getElementById('result').innerHTML = 'Error occurred while processing the form.';
+                });
             }
         }
-
-        // Function to display the user's location
-        function showPosition(position) {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-
-            const locationElement = document.getElementById('location');
-            locationElement.innerHTML = `Your Location: Latitude ${latitude}, Longitude ${longitude}`;
-        }
-
-        // Function to handle location errors
-        function locationError(error) {
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    alert("User denied the request for Geolocation.");
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    alert("Location information is unavailable.");
-                    break;
-                case error.TIMEOUT:
-                    alert("The request to get user location timed out.");
-                    break;
-                case error.UNKNOWN_ERROR:
-                    alert("An unknown error occurred.");
-                    break;
-            }
-        }
-
-        // Attach a location request event to the form submission
-        document.getElementById("loanApplicationForm").addEventListener("submit", function (event) {
-            event.preventDefault(); // Prevent form submission
-
-            if (confirm("Do you want to share your location for this loan application?")) {
-                getLocation(); // Request location access
-            }
-        });
     </script>
 </body>
 
